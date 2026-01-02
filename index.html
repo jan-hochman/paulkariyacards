@@ -4,9 +4,106 @@
   <meta charset="utf-8">
   <title>Paul Kariya Cards</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Paul Kariya Cards</h1>
-  <p>Public hockey card collection.</p>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <h1 id="t-title">Paul Kariya Cards</h1>
+        <p id="t-subtitle">Veřejný katalog hokejových karet.</p>
+      </div>
+
+      <div class="pills">
+        <div class="pill" aria-label="Language switch">
+          <button id="lang-cs" class="active" type="button">CZ</button>
+          <span style="opacity:.35;">/</span>
+          <button id="lang-en" type="button">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div class="search">
+          <input id="search" type="search" placeholder="Hledat… (hráč, set, ročník)" />
+        </div>
+
+        <div class="right-actions">
+          <button class="btn" id="btn-filters" type="button">Filtry</button>
+          <button class="btn" id="btn-login" type="button">Přihlášení</button>
+        </div>
+      </div>
+
+      <div class="grid" id="grid">
+        <!-- Dočasné ukázkové karty -->
+        <article class="card">
+          <div class="thumb">thumbnail</div>
+          <div class="meta">
+            <div class="title">2003-04 In the Game BAP Memorabilia [Base] Sapphire #68</div>
+            <div class="subtitle">Paul Kariya /100</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="thumb">thumbnail</div>
+          <div class="meta">
+            <div class="title">1994-95 Topps Finest Bowman's Best #1</div>
+            <div class="subtitle">Paul Kariya</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="thumb">thumbnail</div>
+          <div class="meta">
+            <div class="title">1997-98 Upper Deck Black Diamond [Base] #15</div>
+            <div class="subtitle">Paul Kariya / PR</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const i18n = {
+      cs: {
+        subtitle: "Veřejný katalog hokejových karet.",
+        searchPlaceholder: "Hledat… (hráč, set, ročník)",
+        filters: "Filtry",
+        login: "Přihlášení"
+      },
+      en: {
+        subtitle: "Public hockey card catalog.",
+        searchPlaceholder: "Search… (player, set, year)",
+        filters: "Filters",
+        login: "Sign in"
+      }
+    };
+
+    const el = {
+      subtitle: document.getElementById("t-subtitle"),
+      search: document.getElementById("search"),
+      btnFilters: document.getElementById("btn-filters"),
+      btnLogin: document.getElementById("btn-login"),
+      cs: document.getElementById("lang-cs"),
+      en: document.getElementById("lang-en")
+    };
+
+    function setLang(lang){
+      localStorage.setItem("lang", lang);
+      el.cs.classList.toggle("active", lang === "cs");
+      el.en.classList.toggle("active", lang === "en");
+      el.subtitle.textContent = i18n[lang].subtitle;
+      el.search.placeholder = i18n[lang].searchPlaceholder;
+      el.btnFilters.textContent = i18n[lang].filters;
+      el.btnLogin.textContent = i18n[lang].login;
+      document.documentElement.lang = lang === "cs" ? "cs" : "en";
+    }
+
+    el.cs.addEventListener("click", () => setLang("cs"));
+    el.en.addEventListener("click", () => setLang("en"));
+
+    setLang(localStorage.getItem("lang") || "cs");
+  </script>
 </body>
 </html>
