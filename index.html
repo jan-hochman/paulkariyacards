@@ -35,75 +35,126 @@
         </div>
       </div>
 
-      <div class="grid" id="grid">
-        <!-- Dočasné ukázkové karty -->
-        <article class="card">
-          <div class="thumb">thumbnail</div>
-          <div class="meta">
-            <div class="title">2003-04 In the Game BAP Memorabilia [Base] Sapphire #68</div>
-            <div class="subtitle">Paul Kariya /100</div>
-          </div>
-        </article>
+      <div class="grid" id="grid"></div>
+<div id="status" style="padding: 0 14px 14px; color: rgba(167,178,195,.9); font-size: 12px;"></div>
 
-        <article class="card">
-          <div class="thumb">thumbnail</div>
-          <div class="meta">
-            <div class="title">1994-95 Topps Finest Bowman's Best #1</div>
-            <div class="subtitle">Paul Kariya</div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="thumb">thumbnail</div>
-          <div class="meta">
-            <div class="title">1997-98 Upper Deck Black Diamond [Base] #15</div>
-            <div class="subtitle">Paul Kariya / PR</div>
-          </div>
-        </article>
-      </div>
-    </section>
-  </div>
-
-  <script>
-    const i18n = {
-      cs: {
-        subtitle: "Veřejný katalog hokejových karet.",
-        searchPlaceholder: "Hledat… (hráč, set, ročník)",
-        filters: "Filtry",
-        login: "Přihlášení"
-      },
-      en: {
-        subtitle: "Public hockey card catalog.",
-        searchPlaceholder: "Search… (player, set, year)",
-        filters: "Filters",
-        login: "Sign in"
-      }
-    };
-
-    const el = {
-      subtitle: document.getElementById("t-subtitle"),
-      search: document.getElementById("search"),
-      btnFilters: document.getElementById("btn-filters"),
-      btnLogin: document.getElementById("btn-login"),
-      cs: document.getElementById("lang-cs"),
-      en: document.getElementById("lang-en")
-    };
-
-    function setLang(lang){
-      localStorage.setItem("lang", lang);
-      el.cs.classList.toggle("active", lang === "cs");
-      el.en.classList.toggle("active", lang === "en");
-      el.subtitle.textContent = i18n[lang].subtitle;
-      el.search.placeholder = i18n[lang].searchPlaceholder;
-      el.btnFilters.textContent = i18n[lang].filters;
-      el.btnLogin.textContent = i18n[lang].login;
-      document.documentElement.lang = lang === "cs" ? "cs" : "en";
+ <script>
+  const i18n = {
+    cs: {
+      subtitle: "Veřejný katalog hokejových karet.",
+      searchPlaceholder: "Hledat… (hráč, set, ročník)",
+      filters: "Filtry",
+      login: "Přihlášení",
+      statusLoaded: (n) => `Načteno karet: ${n}`,
+      statusEmpty: "Žádné výsledky."
+    },
+    en: {
+      subtitle: "Public hockey card catalog.",
+      searchPlaceholder: "Search… (player, set, year)",
+      filters: "Filters",
+      login: "Sign in",
+      statusLoaded: (n) => `Cards loaded: ${n}`,
+      statusEmpty: "No results."
     }
+  };
 
-    el.cs.addEventListener("click", () => setLang("cs"));
-    el.en.addEventListener("click", () => setLang("en"));
+  const el = {
+    subtitle: document.getElementById("t-subtitle"),
+    search: document.getElementById("search"),
+    btnFilters: document.getElementById("btn-filters"),
+    btnLogin: document.getElementById("btn-login"),
+    cs: document.getElementById("lang-cs"),
+    en: document.getElementById("lang-en"),
+    grid: document.getElementById("grid"),
+    status: document.getElementById("status")
+  };
 
-    setLang(localStorage.getItem("lang") || "cs");
-  </script>
+  let currentLang = localStorage.getItem("lang") || "cs";
+  let cards = [];
+  let filtered = [];
+
+  function setLang(lang){
+    currentLang = lang;
+    localStorage.setItem("lang", lang);
+    el.cs.classList.toggle("active", lang === "cs");
+    el.en.classList.toggle("active", lang === "en");
+    el.subtitle.textContent = i18n[lang].subtitle;
+    el.search.placeholder = i18n[lang].searchPlaceholder;
+    el.btnFilters.textContent = i18n[lang].filters;
+    el.btnLogin.textContent = i18n[lang].login;
+    document.documentElement.lang = lang === "cs" ? "cs" : "en";
+    render();
+  }
+
+  el.cs.addEventListener("click", () => setLang("cs"));
+  el.en.addEventListener("click", () => setLang("en"));
+
+  function esc(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function cardTitle(c){
+    // přesný název: "1997-98 Upper Deck Black Diamond [Base] #15"
+    const yearText = c.year ? String(c.year) : "";
+    const subset = c.subset ? ` [${c.subset}]` : "";
+    const parallel = c.parallel ? ` ${c.parallel}` : "";
+    const no = c.cardNumber ? ` ${c.cardNumber}` : "";
+    return `${yearText} ${c.manufacturer ?? ""} ${c.set ?? ""}${subset}${parallel}${no}`.trim().replace(/\s+/g," ");
+  }
+
+  function cardSubtitle(c){
+    // "Paul Kariya /100" nebo "Paul Kariya / PR"
+    const players = Array.isArray(c.players) ? c.players.join(", ") : "";
+    const serial = c.serial ? ` ${c.serial}` : "";
+    return `${players}${serial}`.trim();
+  }
+
+  function render(){
+    const q = (el.search.value || "").toLowerCase().trim();
+
+    filtered = cards.filter(c => {
+      const hay = [
+        cardTitle(c),
+        Array.isArray(c.players) ? c.players.join(" ") : "",
+        c.serial || "",
+        c.type || ""
+      ].join(" ").toLowerCase();
+      return !q || hay.includes(q);
+    });
+
+    el.grid.innerHTML = filtered.map(c => `
+      <article class="card">
+        <div class="thumb">${c.image ? "" : "thumbnail"}</div>
+        <div class="meta">
+          <div class="title">${esc(cardTitle(c))}</div>
+          <div class="subtitle">${esc(cardSubtitle(c))}</div>
+        </div>
+      </article>
+    `).join("");
+
+    el.status.textContent = filtered.length
+      ? i18n[currentLang].statusLoaded(filtered.length)
+      : i18n[currentLang].statusEmpty;
+  }
+
+  el.search.addEventListener("input", render);
+
+  async function loadCards(){
+    const res = await fetch("data/cards.json", { cache: "no-store" });
+    if(!res.ok) throw new Error("cards.json not found");
+    const data = await res.json();
+    cards = Array.isArray(data) ? data : [];
+    render();
+  }
+
+  setLang(currentLang);
+  loadCards().catch(err => {
+    el.status.textContent = "Chyba: nelze načíst data/cards.json";
+    console.error(err);
+  });
+</script>
+
 </body>
 </html>
