@@ -1,160 +1,97 @@
-<!doctype html>
-<html lang="cs">
-<head>
-  <meta charset="utf-8">
-  <title>Paul Kariya Cards</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <div class="container">
-    <header class="topbar">
-      <div class="brand">
+<div class="container">
+
+  <header class="topnav">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
         <h1 id="t-title">Paul Kariya Cards</h1>
         <p id="t-subtitle">Veřejný katalog hokejových karet.</p>
       </div>
+    </div>
 
-      <div class="pills">
-        <div class="pill" aria-label="Language switch">
-          <button id="lang-cs" class="active" type="button">CZ</button>
-          <span style="opacity:.35;">/</span>
-          <button id="lang-en" type="button">EN</button>
+    <nav class="navlinks" aria-label="Menu">
+      <a class="active" href="#" id="nav-catalog">Katalog</a>
+      <a href="#" id="nav-stats">Statistiky</a>
+      <a href="#" id="nav-about">O projektu</a>
+    </nav>
+
+    <div class="actions">
+      <div class="pill" aria-label="Language switch">
+        <button id="lang-cs" class="active" type="button">CZ</button>
+        <span style="opacity:.35;">/</span>
+        <button id="lang-en" type="button">EN</button>
+      </div>
+      <button class="btn" id="btn-login" type="button">Přihlášení</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR FILTERS -->
+    <aside class="panel sidebar">
+      <h2 id="t-filters">Filtry</h2>
+      <p class="hint" id="t-filterhint">Vyberte ročník, set, typ nebo limit. Vyhledávání funguje zároveň.</p>
+
+      <div class="field">
+        <div class="label"><span id="t-year">Ročník</span></div>
+        <select class="select" id="f-year">
+          <option value="">(vše)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="label"><span id="t-man">Výrobce</span></div>
+        <select class="select" id="f-manufacturer">
+          <option value="">(vše)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="label"><span id="t-set">Set</span></div>
+        <select class="select" id="f-set">
+          <option value="">(vše)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <div class="label"><span id="t-type">Typ</span></div>
+          <select class="select" id="f-type">
+            <option value="">(vše)</option>
+            <option value="base">base</option>
+            <option value="insert">insert</option>
+            <option value="memo">memo</option>
+            <option value="auto">auto</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="label"><span id="t-serial">Limit</span></div>
+          <select class="select" id="f-serial">
+            <option value="">(vše)</option>
+            <option value="PR">PR</option>
+            <option value="/10">/10</option>
+            <option value="/25">/25</option>
+            <option value="/50">/50</option>
+            <option value="/100">/100</option>
+            <option value="/200">/200</option>
+          </select>
         </div>
       </div>
-    </header>
 
-    <section class="panel">
+      <button class="btn clear" id="btn-clear" type="button">Vymazat filtry</button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="panel main">
       <div class="toolbar">
         <div class="search">
           <input id="search" type="search" placeholder="Hledat… (hráč, set, ročník)" />
         </div>
-
-        <div class="right-actions">
-          <button class="btn" id="btn-filters" type="button">Filtry</button>
-          <button class="btn" id="btn-login" type="button">Přihlášení</button>
-        </div>
+        <div class="status" id="status"></div>
       </div>
 
       <div class="grid" id="grid"></div>
-<div id="status" style="padding: 0 14px 14px; color: rgba(167,178,195,.9); font-size: 12px;"></div>
+    </main>
+  </div>
 
- <script>
-  const i18n = {
-    cs: {
-      subtitle: "Veřejný katalog hokejových karet.",
-      searchPlaceholder: "Hledat… (hráč, set, ročník)",
-      filters: "Filtry",
-      login: "Přihlášení",
-      statusLoaded: (n) => `Načteno karet: ${n}`,
-      statusEmpty: "Žádné výsledky."
-    },
-    en: {
-      subtitle: "Public hockey card catalog.",
-      searchPlaceholder: "Search… (player, set, year)",
-      filters: "Filters",
-      login: "Sign in",
-      statusLoaded: (n) => `Cards loaded: ${n}`,
-      statusEmpty: "No results."
-    }
-  };
-
-  const el = {
-    subtitle: document.getElementById("t-subtitle"),
-    search: document.getElementById("search"),
-    btnFilters: document.getElementById("btn-filters"),
-    btnLogin: document.getElementById("btn-login"),
-    cs: document.getElementById("lang-cs"),
-    en: document.getElementById("lang-en"),
-    grid: document.getElementById("grid"),
-    status: document.getElementById("status")
-  };
-
-  let currentLang = localStorage.getItem("lang") || "cs";
-  let cards = [];
-  let filtered = [];
-
-  function setLang(lang){
-    currentLang = lang;
-    localStorage.setItem("lang", lang);
-    el.cs.classList.toggle("active", lang === "cs");
-    el.en.classList.toggle("active", lang === "en");
-    el.subtitle.textContent = i18n[lang].subtitle;
-    el.search.placeholder = i18n[lang].searchPlaceholder;
-    el.btnFilters.textContent = i18n[lang].filters;
-    el.btnLogin.textContent = i18n[lang].login;
-    document.documentElement.lang = lang === "cs" ? "cs" : "en";
-    render();
-  }
-
-  el.cs.addEventListener("click", () => setLang("cs"));
-  el.en.addEventListener("click", () => setLang("en"));
-
-  function esc(s){
-    return String(s ?? "").replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
-    }[m]));
-  }
-
-  function cardTitle(c){
-    // přesný název: "1997-98 Upper Deck Black Diamond [Base] #15"
-    const yearText = c.year ? String(c.year) : "";
-    const subset = c.subset ? ` [${c.subset}]` : "";
-    const parallel = c.parallel ? ` ${c.parallel}` : "";
-    const no = c.cardNumber ? ` ${c.cardNumber}` : "";
-    return `${yearText} ${c.manufacturer ?? ""} ${c.set ?? ""}${subset}${parallel}${no}`.trim().replace(/\s+/g," ");
-  }
-
-  function cardSubtitle(c){
-    // "Paul Kariya /100" nebo "Paul Kariya / PR"
-    const players = Array.isArray(c.players) ? c.players.join(", ") : "";
-    const serial = c.serial ? ` ${c.serial}` : "";
-    return `${players}${serial}`.trim();
-  }
-
-  function render(){
-    const q = (el.search.value || "").toLowerCase().trim();
-
-    filtered = cards.filter(c => {
-      const hay = [
-        cardTitle(c),
-        Array.isArray(c.players) ? c.players.join(" ") : "",
-        c.serial || "",
-        c.type || ""
-      ].join(" ").toLowerCase();
-      return !q || hay.includes(q);
-    });
-
-    el.grid.innerHTML = filtered.map(c => `
-      <article class="card">
-        <div class="thumb">${c.image ? "" : "thumbnail"}</div>
-        <div class="meta">
-          <div class="title">${esc(cardTitle(c))}</div>
-          <div class="subtitle">${esc(cardSubtitle(c))}</div>
-        </div>
-      </article>
-    `).join("");
-
-    el.status.textContent = filtered.length
-      ? i18n[currentLang].statusLoaded(filtered.length)
-      : i18n[currentLang].statusEmpty;
-  }
-
-  el.search.addEventListener("input", render);
-
-  async function loadCards(){
-    const res = await fetch("data/cards.json", { cache: "no-store" });
-    if(!res.ok) throw new Error("cards.json not found");
-    const data = await res.json();
-    cards = Array.isArray(data) ? data : [];
-    render();
-  }
-
-  setLang(currentLang);
-  loadCards().catch(err => {
-    el.status.textContent = "Chyba: nelze načíst data/cards.json";
-    console.error(err);
-  });
-</script>
-
-</body>
-</html>
+</div>
