@@ -1,61 +1,236 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <title>Paul Kariya Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- BASIC DARK UI -->
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a2f;
+      --panel-2:#0f1630;
+      --border:#1e2a4a;
+      --text:#e6ebff;
+      --muted:#9aa6d1;
+      --accent:#4ea1ff;
+      --accent-2:#6be6c1;
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+      background:radial-gradient(1200px 600px at 20% -10%, #1a2550 0%, transparent 60%), var(--bg);
+      color:var(--text);
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    .container{max-width:1400px;margin:0 auto;padding:20px}
+
+    /* HEADER */
+    .topnav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      padding:16px 20px;
+      background:linear-gradient(135deg,#0f1630,#0b1020);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      margin-bottom:20px;
+    }
+
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{
+      width:44px;height:44px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 0 20px rgba(78,161,255,.6);
+    }
+    h1{margin:0;font-size:1.4rem}
+    p{margin:.2rem 0 0;color:var(--muted);font-size:.9rem}
+
+    .navlinks{display:flex;gap:18px}
+    .navlinks a{
+      padding:6px 10px;
+      border-radius:8px;
+      color:var(--muted);
+    }
+    .navlinks a.active,
+    .navlinks a:hover{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+    }
+
+    .actions{display:flex;gap:12px;align-items:center}
+
+    .pill{
+      display:flex;gap:6px;align-items:center;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:4px 10px;
+    }
+    .pill button{
+      background:none;border:0;color:var(--muted);cursor:pointer;
+      font-weight:600
+    }
+    .pill button.active{color:var(--text)}
+
+    .btn{
+      background:linear-gradient(135deg,var(--accent),#3a7dff);
+      border:0;color:#fff;padding:8px 14px;
+      border-radius:10px;cursor:pointer;font-weight:600
+    }
+    .btn.clear{
+      width:100%;
+      background:#1b2546
+    }
+
+    /* LAYOUT */
+    .shell{display:grid;grid-template-columns:280px 1fr;gap:20px}
+
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+    }
+
+    /* SIDEBAR */
+    .sidebar h2{margin-top:0}
+    .hint{font-size:.85rem;color:var(--muted);margin-bottom:16px}
+
+    .field{margin-bottom:14px}
+    .label{font-size:.8rem;color:var(--muted);margin-bottom:4px}
+
+    .select,input[type=search]{
+      width:100%;
+      background:#0c1430;
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:10px;
+    }
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    /* MAIN */
+    .toolbar{
+      display:flex;justify-content:space-between;gap:12px;margin-bottom:14px
+    }
+    .status{font-size:.85rem;color:var(--muted)}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,#111a38,#0c1430);
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+      transition:.25s;
+      cursor:pointer;
+    }
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 12px 30px rgba(0,0,0,.4);
+    }
+
+    .thumb{
+      height:280px;
+      background:#08102a;
+      display:flex;align-items:center;justify-content:center;
+      color:#5f6fb3;font-size:.9rem
+    }
+
+    .meta{padding:12px}
+    .title{font-size:.95rem;font-weight:600;margin-bottom:4px}
+    .subtitle{font-size:.8rem;color:var(--muted)}
+
+    .badges{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+    .badge{
+      font-size:.7rem;
+      padding:3px 6px;
+      border-radius:6px;
+      background:#1a2550;
+      color:#c9d3ff;
+    }
+    .badge.accent{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#08102a;
+      font-weight:700;
+    }
+
+    @media(max-width:900px){
+      .shell{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
 <div class="container">
 
   <header class="topnav">
     <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
+      <div class="logo"></div>
       <div>
         <h1 id="t-title">Paul Kariya Cards</h1>
         <p id="t-subtitle">Veřejný katalog hokejových karet.</p>
       </div>
     </div>
 
-    <nav class="navlinks" aria-label="Menu">
+    <nav class="navlinks">
       <a class="active" href="#" id="nav-catalog">Katalog</a>
       <a href="#" id="nav-stats">Statistiky</a>
       <a href="#" id="nav-about">O projektu</a>
     </nav>
 
     <div class="actions">
-      <div class="pill" aria-label="Language switch">
-        <button id="lang-cs" class="active" type="button">CZ</button>
-        <span style="opacity:.35;">/</span>
-        <button id="lang-en" type="button">EN</button>
+      <div class="pill">
+        <button id="lang-cs" class="active">CZ</button>
+        <span>/</span>
+        <button id="lang-en">EN</button>
       </div>
-      <button class="btn" id="btn-login" type="button">Přihlášení</button>
+      <button class="btn" id="btn-login">Přihlášení</button>
     </div>
   </header>
 
   <div class="shell">
-    <!-- SIDEBAR FILTERS -->
+
+    <!-- FILTERS -->
     <aside class="panel sidebar">
       <h2 id="t-filters">Filtry</h2>
-      <p class="hint" id="t-filterhint">Vyberte ročník, set, typ nebo limit. Vyhledávání funguje zároveň.</p>
+      <p class="hint" id="t-filterhint">
+        Vyberte ročník, set, typ nebo limit.
+      </p>
 
       <div class="field">
-        <div class="label"><span id="t-year">Ročník</span></div>
-        <select class="select" id="f-year">
-          <option value="">(vše)</option>
-        </select>
+        <div class="label" id="t-year">Ročník</div>
+        <select id="f-year" class="select"><option value="">(vše)</option></select>
       </div>
 
       <div class="field">
-        <div class="label"><span id="t-man">Výrobce</span></div>
-        <select class="select" id="f-manufacturer">
-          <option value="">(vše)</option>
-        </select>
+        <div class="label" id="t-man">Výrobce</div>
+        <select id="f-manufacturer" class="select"><option value="">(vše)</option></select>
       </div>
 
       <div class="field">
-        <div class="label"><span id="t-set">Set</span></div>
-        <select class="select" id="f-set">
-          <option value="">(vše)</option>
-        </select>
+        <div class="label" id="t-set">Set</div>
+        <select id="f-set" class="select"><option value="">(vše)</option></select>
       </div>
 
       <div class="row">
         <div class="field">
-          <div class="label"><span id="t-type">Typ</span></div>
-          <select class="select" id="f-type">
+          <div class="label" id="t-type">Typ</div>
+          <select id="f-type" class="select">
             <option value="">(vše)</option>
             <option value="base">base</option>
             <option value="insert">insert</option>
@@ -65,8 +240,8 @@
         </div>
 
         <div class="field">
-          <div class="label"><span id="t-serial">Limit</span></div>
-          <select class="select" id="f-serial">
+          <div class="label" id="t-serial">Limit</div>
+          <select id="f-serial" class="select">
             <option value="">(vše)</option>
             <option value="PR">PR</option>
             <option value="/10">/10</option>
@@ -78,20 +253,106 @@
         </div>
       </div>
 
-      <button class="btn clear" id="btn-clear" type="button">Vymazat filtry</button>
+      <button class="btn clear" id="btn-clear">Vymazat filtry</button>
     </aside>
 
     <!-- MAIN -->
     <main class="panel main">
       <div class="toolbar">
-        <div class="search">
-          <input id="search" type="search" placeholder="Hledat… (hráč, set, ročník)" />
-        </div>
+        <input id="search" type="search" placeholder="Hledat… (hráč, set, ročník)">
         <div class="status" id="status"></div>
       </div>
 
       <div class="grid" id="grid"></div>
     </main>
-  </div>
 
+  </div>
 </div>
+
+<!-- LOGIC -->
+<script>
+let cards=[];
+const grid=document.getElementById("grid");
+const status=document.getElementById("status");
+
+function load(){
+  fetch("data/cards.json",{cache:"no-store"})
+    .then(r=>r.json())
+    .then(d=>{
+      cards=d;
+      fillFilters();
+      render();
+    });
+}
+
+function fillFilters(){
+  const years=[...new Set(cards.map(c=>c.year))].sort();
+  const mans=[...new Set(cards.map(c=>c.manufacturer))].sort();
+  const sets=[...new Set(cards.map(c=>c.set))].sort();
+
+  fill("f-year",years);
+  fill("f-manufacturer",mans);
+  fill("f-set",sets);
+}
+
+function fill(id,arr){
+  const s=document.getElementById(id);
+  arr.forEach(v=>{
+    if(!v)return;
+    const o=document.createElement("option");
+    o.value=v;o.textContent=v;
+    s.appendChild(o);
+  });
+}
+
+function render(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const fy=f("f-year"), fm=f("f-manufacturer"),
+        fs=f("f-set"), ft=f("f-type"), fr=f("f-serial");
+
+  const out=cards.filter(c=>{
+    if(fy && String(c.year)!==fy)return false;
+    if(fm && c.manufacturer!==fm)return false;
+    if(fs && c.set!==fs)return false;
+    if(ft && c.type!==ft)return false;
+    if(fr && c.serial!==fr)return false;
+    if(q){
+      const h=(c.set+" "+c.manufacturer+" "+c.players).toLowerCase();
+      if(!h.includes(q))return false;
+    }
+    return true;
+  });
+
+  grid.innerHTML=out.map(c=>`
+    <div class="card">
+      <div class="thumb">${c.image ? `<img src="images/cards/${c.image}" style="width:100%;height:100%;object-fit:cover">` : "thumbnail"}</div>
+      <div class="meta">
+        <div class="title">${c.year} ${c.manufacturer} ${c.set}</div>
+        <div class="subtitle">${c.players} ${c.serial||""}</div>
+        <div class="badges">
+          ${c.type?`<span class="badge">${c.type}</span>`:""}
+          ${c.serial?`<span class="badge accent">${c.serial}</span>`:""}
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  status.textContent=`Zobrazeno: ${out.length}`;
+}
+
+function f(id){return document.getElementById(id).value}
+
+["search","f-year","f-manufacturer","f-set","f-type","f-serial"]
+  .forEach(id=>document.getElementById(id).addEventListener("input",render));
+
+document.getElementById("btn-clear").onclick=()=>{
+  ["search","f-year","f-manufacturer","f-set","f-type","f-serial"]
+    .forEach(id=>document.getElementById(id).value="");
+  render();
+};
+
+load();
+</script>
+
+</body>
+</html>
