@@ -1,0 +1,41 @@
+[
+  {
+    "id": "itg-bap-sapphire-68",
+    "year": 2003,
+    "manufacturer": "In the Game",
+    "set": "BAP Memorabilia",
+    "subset": "Base",
+    "parallel": "Sapphire",
+    "cardNumber": "#68",
+    "players": ["Paul Kariya"],
+    "serial": "/100",
+    "type": "base",
+    "image": null
+  },
+  {
+    "id": "topps-finest-bb-1",
+    "year": 1994,
+    "manufacturer": "Topps",
+    "set": "Finest",
+    "subset": "Bowman's Best",
+    "parallel": null,
+    "cardNumber": "#1",
+    "players": ["Paul Kariya"],
+    "serial": null,
+    "type": "insert",
+    "image": null
+  },
+  {
+    "id": "ud-black-diamond-15",
+    "year": 1997,
+    "manufacturer": "Upper Deck",
+    "set": "Black Diamond",
+    "subset": "Base",
+    "parallel": null,
+    "cardNumber": "#15",
+    "players": ["Paul Kariya"],
+    "serial": "PR",
+    "type": "base",
+    "image": null
+  }
+]
