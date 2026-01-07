@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{<!DOCTYPE html>
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
@@ -354,5 +354,35 @@ document.getElementById("btn-clear").onclick=()=>{
 load();
 </script>
 
+
+  <!-- CARD MODAL -->
+<div id="cardModal" class="modal hidden" aria-hidden="true">
+  <div class="modal__backdrop" data-close="1"></div>
+
+  <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Karta">
+    <div class="modal__head">
+      <div>
+        <div id="mTitle" class="modal__title">Název</div>
+        <div id="mSub" class="modal__sub">Detail</div>
+      </div>
+      <button id="mClose" class="modal__close" type="button">Zavřít</button>
+    </div>
+
+    <div class="modal__body">
+      <figure class="modal__figure">
+        <img id="mFront" alt="Front" loading="lazy">
+        <figcaption class="modal__cap">Front</figcaption>
+      </figure>
+
+      <figure class="modal__figure">
+        <img id="mBack" alt="Back" loading="lazy">
+        <figcaption class="modal__cap">Back</figcaption>
+      </figure>
+    </div>
+  </div>
+</div>
+
+
+  
 </body>
 </html>
