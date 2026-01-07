@@ -275,6 +275,44 @@ let cards=[];
 const grid=document.getElementById("grid");
 const status=document.getElementById("status");
 
+// MODAL
+const cardModal = document.getElementById("cardModal");
+const mTitle = document.getElementById("mTitle");
+const mSub = document.getElementById("mSub");
+const mFront = document.getElementById("mFront");
+const mBack = document.getElementById("mBack");
+const mClose = document.getElementById("mClose");
+
+function openCard(card){
+  mTitle.textContent = `${card.year} ${card.manufacturer} ${card.set}`;
+  const players = Array.isArray(card.players) ? card.players.join(", ") : (card.players || "");
+  mSub.textContent = `${players}${card.serial ? " / " + card.serial : ""}`;
+
+  const frontFile = card.images?.front || card.image || "";
+  const backFile  = card.images?.back || "";
+
+  mFront.src = frontFile ? `images/cards/${frontFile}` : "";
+  mBack.src  = backFile  ? `images/cards/${backFile}`  : "";
+
+  cardModal.classList.remove("hidden");
+  cardModal.setAttribute("aria-hidden","false");
+}
+
+function closeCard(){
+  cardModal.classList.add("hidden");
+  cardModal.setAttribute("aria-hidden","true");
+  mFront.src = "";
+  mBack.src = "";
+}
+
+mClose.addEventListener("click", closeCard);
+cardModal.addEventListener("click", (e) => {
+  if (e.target && e.target.dataset && e.target.dataset.close === "1") closeCard();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !cardModal.classList.contains("hidden")) closeCard();
+});
+
 function load(){
   fetch("data/cards.json",{cache:"no-store"})
     .then(r=>r.json())
@@ -282,31 +320,44 @@ function load(){
       cards=d;
       fillFilters();
       render();
+    })
+    .catch(err=>{
+      console.error(err);
+      status.textContent="Chyba: nepodařilo se načíst data/cards.json";
     });
 }
 
 function fillFilters(){
-  const years=[...new Set(cards.map(c=>c.year))].sort();
-  const mans=[...new Set(cards.map(c=>c.manufacturer))].sort();
-  const sets=[...new Set(cards.map(c=>c.set))].sort();
+  const years=[...new Set(cards.map(c=>c.year).filter(Boolean))].sort((a,b)=>a-b);
+  const mans=[...new Set(cards.map(c=>c.manufacturer).filter(Boolean))].sort();
+  const sets=[...new Set(cards.map(c=>c.set).filter(Boolean))].sort();
+
+  resetSelect("f-year");
+  resetSelect("f-manufacturer");
+  resetSelect("f-set");
 
   fill("f-year",years);
   fill("f-manufacturer",mans);
   fill("f-set",sets);
 }
 
+function resetSelect(id){
+  const s=document.getElementById(id);
+  s.innerHTML = '<option value="">(vše)</option>';
+}
+
 function fill(id,arr){
   const s=document.getElementById(id);
   arr.forEach(v=>{
-    if(!v)return;
     const o=document.createElement("option");
-    o.value=v;o.textContent=v;
+    o.value=String(v);
+    o.textContent=String(v);
     s.appendChild(o);
   });
 }
 
 function render(){
-  const q=document.getElementById("search").value.toLowerCase();
+  const q=document.getElementById("search").value.toLowerCase().trim();
   const fy=f("f-year"), fm=f("f-manufacturer"),
         fs=f("f-set"), ft=f("f-type"), fr=f("f-serial");
 
@@ -316,26 +367,47 @@ function render(){
     if(fs && c.set!==fs)return false;
     if(ft && c.type!==ft)return false;
     if(fr && c.serial!==fr)return false;
+
     if(q){
-      const h=(c.set+" "+c.manufacturer+" "+c.players).toLowerCase();
+      const players = Array.isArray(c.players) ? c.players.join(" ") : (c.players || "");
+      const h = `${c.year} ${c.manufacturer} ${c.set} ${players}`.toLowerCase();
       if(!h.includes(q))return false;
     }
     return true;
   });
 
-  grid.innerHTML=out.map(c=>`
-    <div class="card">
-      <div class="thumb">${c.image ? `<img src="images/cards/${c.image}" style="width:100%;height:100%;object-fit:cover">` : "thumbnail"}</div>
-      <div class="meta">
-        <div class="title">${c.year} ${c.manufacturer} ${c.set}</div>
-        <div class="subtitle">${c.players} ${c.serial||""}</div>
-        <div class="badges">
-          ${c.type?`<span class="badge">${c.type}</span>`:""}
-          ${c.serial?`<span class="badge accent">${c.serial}</span>`:""}
+  grid.innerHTML=out.map(c=>{
+    const frontFile = c.images?.front || c.image || "";
+    const frontHTML = frontFile
+      ? `<img loading="lazy" src="images/cards/${frontFile}" style="width:100%;height:100%;object-fit:cover">`
+      : "thumbnail";
+
+    const players = Array.isArray(c.players) ? c.players.join(", ") : (c.players || "");
+
+    return `
+      <div class="card" data-id="${c.id || ""}">
+        <div class="thumb">${frontHTML}</div>
+        <div class="meta">
+          <div class="title">${c.year} ${c.manufacturer} ${c.set}</div>
+          <div class="subtitle">${players} ${c.serial||""}</div>
+          <div class="badges">
+            ${c.type?`<span class="badge">${c.type}</span>`:""}
+            ${c.serial?`<span class="badge accent">${c.serial}</span>`:""}
+          </div>
         </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
+
+  // click binding -> modal
+  grid.querySelectorAll(".card").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.getAttribute("data-id");
+      if(!id) return;
+      const card = cards.find(x => String(x.id) === String(id));
+      if(card) openCard(card);
+    });
+  });
 
   status.textContent=`Zobrazeno: ${out.length}`;
 }
