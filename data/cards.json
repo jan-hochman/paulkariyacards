@@ -37,5 +37,22 @@
     "serial": "PR",
     "type": "base",
     "image": null
+  },
+  {
+    "id": "test-card",
+    "year": 2003,
+    "manufacturer": "In the Game",
+    "set": "BAP Memorabilia",
+    "subset": "Base",
+    "parallel": "Sapphire",
+    "cardNumber": "#68",
+    "players": ["Paul Kariya"],
+    "serial": "/100",
+    "type": "base",
+    "images": {
+      "front": "test-card__front.jpg",
+      "back": "test-card__back.jpg"
+    }
   }
 ]
+
